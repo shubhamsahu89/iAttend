@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import pickle
+import json
 from pathlib import Path
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -64,21 +65,40 @@ FRAME_SCALE_FACTOR = 0.25
 FACES_DIR.mkdir(exist_ok=True)
 DATA_DIR.mkdir(exist_ok=True)
 
-TEACHER_CREDENTIALS = {
-    'samiksha@gmail.com': {'password': generate_password_hash('admin'), 'name': 'Samiksha Shukla'},
-    'kunal@gmail.com': {'password': generate_password_hash('admin1'), 'name': 'Kunal kumar'},
-    'himanshu@gmail.com': {'password': generate_password_hash('admin2'), 'name': 'Himanshu Mokashe'},
-    'priyanka@gmail.com': {'password': generate_password_hash('admin3'), 'name': 'Priyanka Sahu'}
-}
+TEACHERS_FILE = DATA_DIR / 'teachers.json'
 
-# Add teacher credentials from env if defined (hashed securely)
-env_teacher_username = os.environ.get('TEACHER_USERNAME')
-env_teacher_password = os.environ.get('TEACHER_PASSWORD')
-if env_teacher_username and env_teacher_password:
-    TEACHER_CREDENTIALS[env_teacher_username] = {
-        'password': generate_password_hash(env_teacher_password),
-        'name': env_teacher_username.split('@')[0].capitalize()
+def load_teacher_credentials():
+    default_accounts = {
+        'samiksha@gmail.com': {'password': generate_password_hash('admin'), 'name': 'Samiksha Shukla'},
+        'kunal@gmail.com': {'password': generate_password_hash('admin1'), 'name': 'Kunal kumar'},
+        'himanshu@gmail.com': {'password': generate_password_hash('admin2'), 'name': 'Himanshu Mokashe'},
+        'priyanka@gmail.com': {'password': generate_password_hash('admin3'), 'name': 'Priyanka Sahu'}
     }
+    
+    # Initialize file if missing (ignored by Git)
+    if not TEACHERS_FILE.exists():
+        with open(TEACHERS_FILE, 'w') as f:
+            json.dump(default_accounts, f, indent=4)
+            
+    # Load from JSON file
+    try:
+        with open(TEACHERS_FILE, 'r') as f:
+            credentials = json.load(f)
+    except Exception:
+        credentials = default_accounts
+
+    # Merge custom credential from .env if defined
+    env_teacher_username = os.environ.get('TEACHER_USERNAME')
+    env_teacher_password = os.environ.get('TEACHER_PASSWORD')
+    if env_teacher_username and env_teacher_password:
+        credentials[env_teacher_username] = {
+            'password': generate_password_hash(env_teacher_password),
+            'name': env_teacher_username.split('@')[0].capitalize()
+        }
+        
+    return credentials
+
+TEACHER_CREDENTIALS = load_teacher_credentials()
 
 def load_or_encode_faces():
     if ENCODINGS_FILE.exists():
