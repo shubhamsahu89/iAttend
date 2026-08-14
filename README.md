@@ -128,28 +128,32 @@ npm run dev
 
 ## 🚀 Production Build & Deployment
 
-To deploy the app as a unified, single-port service, follow these steps:
+To deploy the app as a unified, single-port service, you can run it locally or host it in the cloud.
 
-### 1. Compile the React Frontend
-Navigate to the `frontend/` directory and run:
-```bash
-npm run build
-```
-This compiles the React app into static optimized files inside the `frontend/dist/` directory.
+### Option A: Unified Local Run (Production Mode)
+1. **Compile the React Frontend**
+   Navigate to the `frontend/` directory and run:
+   ```bash
+   npm run build
+   ```
+2. **Start the Flask Server**
+   Go back to the root directory and run:
+   ```bash
+   python app.py
+   ```
+   Flask will automatically serve the entire compiled React SPA from port `5000` at [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
-### 2. Start the Unified Flask Server
-Go back to the root directory and run the Flask server:
-```bash
-python app.py
-```
-Flask will automatically detect the compiled files inside `frontend/dist/` and serve the entire frontend SPA from its own port! 
+### Option B: Cloud Deployment to Render (Docker Method - Recommended)
+Because the `face_recognition` library requires compiling `dlib` (which is CPU/RAM intensive and often fails on Render's standard Python Free tier due to memory limitations), the **Docker deployment method** is recommended. We have provided a `Dockerfile` at the root of the repository.
 
-### 3. Access in Browser
-Open:
-```
-http://127.0.0.1:5000
-```
-This is the single-port production-ready instance, suitable for deployment to hosting platforms like Heroku, Render, AWS, or GCP.
+1. Create a new **Web Service** on Render.
+2. Connect your GitHub repository.
+3. Under **Runtime**, select **Docker** (instead of Python).
+4. Render will automatically detect the `Dockerfile`, build the multi-stage container (compiling both React and Python), and run Gunicorn securely.
+5. In your Render Dashboard, go to **Environment Variables** and add:
+   - `SECRET_KEY`: *[A secure random key]*
+   - `TEACHER_USERNAME`: `admin@gmail.com`
+   - `TEACHER_PASSWORD`: `admin`
 
 ---
 
