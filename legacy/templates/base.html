@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iAttend | Intelligent Face Recognition System</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Design Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Material Design Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <!-- Google Styled Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom mb-4">
+        <div class="container px-3">
+            <a class="navbar-brand-custom" href="{{ url_for('landing') }}">
+                <span class="brand-dot" style="background-color: var(--google-blue);"></span>
+                <span class="brand-dot" style="background-color: var(--google-red);"></span>
+                <span class="brand-dot" style="background-color: var(--google-yellow);"></span>
+                <span class="brand-dot" style="background-color: var(--google-green);"></span>
+                iAttend
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if session.get('teacher') %}
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom" href="{{ url_for('index') }}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom" href="{{ url_for('select_subject') }}">Take Attendance</a>
+                        </li>
+                        <li class="nav-item ms-lg-3">
+                            <a class="btn btn-google btn-google-secondary px-3 py-2 d-flex align-items-center gap-1" href="{{ url_for('logout') }}">
+                                <span class="material-icons" style="font-size: 18px;">logout</span> Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom" href="{{ url_for('student_view') }}">Student Dashboard</a>
+                        </li>
+                        <li class="nav-item ms-lg-3">
+                            <a class="btn btn-google px-3 py-2 d-flex align-items-center gap-1" href="{{ url_for('teacher_login') }}">
+                                <span class="material-icons" style="font-size: 18px;">login</span> Teacher Panel
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages Container -->
+    <div class="container px-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show border-0 shadow-sm rounded-3 py-3 px-4 mb-4 d-flex align-items-center gap-2">
+                        <span class="material-icons">
+                            {% if category == 'success' %}check_circle{% elif category == 'warning' %}warning{% else %}error{% endif %}
+                        </span>
+                        <div>{{ message }}</div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Block -->
+    <main class="container px-3 fade-in-up">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 mt-5 text-secondary border-top bg-white border-light">
+        <div class="container">
+            <p class="mb-0 small">&copy; iAttend Face Recognition System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-dismiss flash alerts after 6 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 6000);
+        });
+    </script>
+</body>
+</html>

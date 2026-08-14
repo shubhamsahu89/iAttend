@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center align-items-center py-5">
+    <div class="col-lg-8 text-center mb-5">
+        <h1 class="display-5 fw-bold mb-3" style="font-family: 'Outfit', sans-serif;">🤖 Welcome to iAttend</h1>
+        <p class="lead text-secondary">A modern, real-time face recognition attendance logging system designed for schools and universities.</p>
+    </div>
+    
+    <div class="col-md-5 mb-4">
+        <div class="card-custom text-center py-5 h-100 d-flex flex-column align-items-center justify-content-center">
+            <span class="material-icons text-primary" style="font-size: 64px; margin-bottom: 16px;">school</span>
+            <h3>Student Dashboard</h3>
+            <p class="text-secondary px-3 mb-4">View subject-wise attendance logs, overall attendance percentages, and top student rankings.</p>
+            <a href="{{ url_for('student_view') }}" class="btn btn-google btn-google-secondary mt-auto w-75">Open Dashboard</a>
+        </div>
+    </div>
+
+    <div class="col-md-5 mb-4">
+        <div class="card-custom text-center py-5 h-100 d-flex flex-column align-items-center justify-content-center">
+            <span class="material-icons text-success" style="font-size: 64px; margin-bottom: 16px;">co_present</span>
+            <h3>Teacher Panel</h3>
+            <p class="text-secondary px-3 mb-4">Log in to register new students, configure class sessions, and launch the face recognition camera module.</p>
+            <a href="{{ url_for('teacher_login') }}" class="btn btn-google mt-auto w-75">Teacher Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

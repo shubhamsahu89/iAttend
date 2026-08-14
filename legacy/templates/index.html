@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row pt-2">
+    <!-- Header Summary -->
+    <div class="col-12 mb-4 d-flex align-items-center justify-content-between">
+        <div>
+            <h2 class="mb-1" style="font-family: 'Outfit', sans-serif;">Teacher Dashboard</h2>
+            <p class="text-secondary mb-0">Logged in as: <strong class="text-dark">{{ teacher if teacher else 'Instructor' }}</strong></p>
+        </div>
+        <div>
+            <span class="badge-custom badge-custom-green py-2 px-3 fw-bold">System Active</span>
+        </div>
+    </div>
+
+    <!-- Column 1: Register Student -->
+    <div class="col-md-6 mb-4">
+        <div class="card-custom h-100">
+            <div class="card-header-custom d-flex align-items-center gap-2">
+                <span class="material-icons text-primary">person_add</span>
+                <h4 class="mb-0">Register New Student</h4>
+            </div>
+            
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <div class="form-group-custom">
+                    <label for="name" class="form-label small text-secondary fw-bold">Full Name</label>
+                    <input type="text" class="form-control form-control-custom" id="name" name="name" required placeholder="John Doe">
+                </div>
+                
+                <div class="form-group-custom">
+                    <label for="roll" class="form-label small text-secondary fw-bold">Roll Number</label>
+                    <input type="text" class="form-control form-control-custom" id="roll" name="roll" required placeholder="e.g. 21000">
+                </div>
+                
+                <div class="form-group-custom">
+                    <label for="photos" class="form-label small text-secondary fw-bold">Student Photos</label>
+                    <input type="file" class="form-control form-control-custom" id="photos" name="photos" multiple required accept="image/*">
+                    <small class="text-muted mt-1 d-block" style="font-size: 12px;">Select multiple photos from different angles/lighting.</small>
+                </div>
+                
+                <button type="submit" class="btn btn-google w-100 mt-2 d-flex align-items-center justify-content-center gap-1">
+                    <span class="material-icons">save</span> Register & Encode
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Column 2: Take Attendance -->
+    <div class="col-md-6 mb-4">
+        <div class="card-custom h-100 d-flex flex-column">
+            <div class="card-header-custom d-flex align-items-center gap-2">
+                <span class="material-icons text-success">camera_alt</span>
+                <h4 class="mb-0">Attendance Actions</h4>
+            </div>
+            
+            <form action="/select_subject" method="POST" class="d-flex flex-column h-100">
+                <div class="form-group-custom">
+                    <label for="subject" class="form-label small text-secondary fw-bold">Select Course / Subject</label>
+                    <select class="form-control form-control-custom" id="subject" name="subject" required>
+                        <option value="">-- Choose Subject --</option>
+                        <option value="BIG DATA">BIG DATA</option>
+                        <option value="CYBER SECURITY">CYBER SECURITY</option>
+                        <option value="HADOOP LAB">HADOOP LAB</option>
+                        <option value="DMW">DMW</option>
+                    </select>
+                </div>
+                
+                <div class="d-flex flex-column gap-3 mt-auto">
+                    <button type="submit" class="btn btn-google w-100 py-3 d-flex align-items-center justify-content-center gap-2" style="font-size: 15px;">
+                        <span class="material-icons">play_circle</span> Start Camera Recognition
+                    </button>
+                    
+                    <a href="/download" class="btn btn-google btn-google-secondary w-100 d-flex align-items-center justify-content-center gap-2">
+                        <span class="material-icons">download</span> Download Attendance log (CSV)
+                    </a>
+                </div>
+            </form>
+            
+            <div class="alert alert-info border-0 shadow-sm rounded-3 py-3 px-4 mt-4 mb-0 d-flex align-items-start gap-2">
+                <span class="material-icons text-info">info</span>
+                <div style="font-size: 13px;">
+                    <strong>Process:</strong> Select a subject, launch the scanner, align the student's face with the webcam stream, and press <strong>'q'</strong> on the popup window to stop.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Column: Attendance Records Table -->
+    <div class="col-12 mt-3">
+        <div class="card-custom">
+            <div class="card-header-custom d-flex align-items-center gap-2">
+                <span class="material-icons text-warning">analytics</span>
+                <h4 class="mb-0">Recent Attendance Records</h4>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Roll Number</th>
+                            <th>Subject</th>
+                            <th>Time</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if data %}
+                            {% for row in data %}
+                            <tr>
+                                <td class="fw-semibold">{{ row[0] }}</td>
+                                <td>{{ row[1] }}</td>
+                                <td><span class="badge-custom">{{ row[4] }}</span></td>
+                                <td>{{ row[2] }}</td>
+                                <td>{{ row[3] }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No attendance sessions recorded yet.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

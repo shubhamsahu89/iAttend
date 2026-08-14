@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Configuration and Secrets
+.env
+
+# User Uploads and Runtime Data
+data/
+static/uploads/
+*.db
+*.log
+
+# IDEs and Editors
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+Thumbs.db
+db.ini
+ehthumbs.db
+Desktop.ini
+.DS_Store

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card-custom signin-card mt-4">
+            <!-- Google styling header -->
+            <div class="logo-container">
+                <span class="text-primary">G</span><span class="text-danger">o</span><span class="text-warning">o</span><span class="text-primary">g</span><span class="text-success">l</span><span class="text-danger">e</span>
+                <div class="fs-4 mt-2 text-dark" style="font-family: 'Outfit', sans-serif;">iAttend Sign in</div>
+                <div class="fs-6 text-secondary fw-normal mt-1">to continue to Teacher Panel</div>
+            </div>
+            
+            <form method="POST">
+                <div class="form-group-custom text-start">
+                    <label for="username" class="form-label small text-secondary fw-bold">Teacher Email / ID</label>
+                    <input type="email" class="form-control form-control-custom" id="username" name="username" required placeholder="name@gmail.com">
+                </div>
+                
+                <div class="form-group-custom text-start">
+                    <label for="password" class="form-label small text-secondary fw-bold">Password</label>
+                    <input type="password" class="form-control form-control-custom" id="password" name="password" required placeholder="••••••••">
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a href="{{ url_for('landing') }}" class="text-primary text-decoration-none small">Cancel</a>
+                    <button type="submit" class="btn btn-google">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

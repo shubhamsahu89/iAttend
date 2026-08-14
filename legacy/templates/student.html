@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row pt-2">
+    <!-- Header Title -->
+    <div class="col-12 mb-4 d-flex align-items-center justify-content-between">
+        <div>
+            <h2 class="mb-1" style="font-family: 'Outfit', sans-serif;">Student Attendance Dashboard</h2>
+            <p class="text-secondary mb-0">Real-time statistics and summary logs.</p>
+        </div>
+        <div>
+            <a href="{{ url_for('download_summary') }}" class="btn btn-google btn-google-success d-flex align-items-center gap-1">
+                <span class="material-icons">download</span> Download Summary CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Section 1: Top 5 Rankings -->
+    <div class="col-12 mb-4">
+        <div class="card-custom">
+            <div class="card-header-custom d-flex align-items-center gap-2">
+                <span class="material-icons text-warning">emoji_events</span>
+                <h4 class="mb-0">Top 5 Students by Attendance</h4>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 80px;">Rank</th>
+                            <th>Student Name</th>
+                            <th>Roll Number</th>
+                            <th class="text-center">Total Attendance</th>
+                            <th class="text-center">Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if top_5_students %}
+                            {% for student in top_5_students %}
+                            <tr>
+                                <td class="text-center fw-bold text-primary">{{ loop.index }}</td>
+                                <td class="fw-semibold">{{ student['Name'] }}</td>
+                                <td>{{ student['Roll No'] }}</td>
+                                <td class="text-center">{{ student['Total'] }}</td>
+                                <td class="text-center fw-semibold">
+                                    {% if student['Max Total'] %}
+                                        {{ (student['Total'] / student['Max Total'] * 100) | round(1) }}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No student records found.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Subject-wise Summary Table -->
+    <div class="col-12 mb-4">
+        <div class="card-custom">
+            <div class="card-header-custom d-flex align-items-center gap-2">
+                <span class="material-icons text-primary">menu_book</span>
+                <h4 class="mb-0">Subject-wise Attendance Summary</h4>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table-custom text-center">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Name</th>
+                            <th class="text-start">Roll No</th>
+                            {% for subject, max_count in subject_max_counts.items() %}
+                                <th>{{ subject }} <div class="text-secondary small fw-normal">Total: {{ max_count }}</div></th>
+                            {% endfor %}
+                            <th>Total Attended <div class="text-secondary small fw-normal">(with %)</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if summary %}
+                            {% for row in summary %}
+                                <tr>
+                                    <td class="text-start fw-semibold">{{ row['Name'] }}</td>
+                                    <td class="text-start">{{ row['Roll No'] }}</td>
+                                    {% for subject in subject_max_counts %}
+                                        <td>
+                                            <div class="fw-bold">{{ row.get(subject, 0) }}</div>
+                                            {% if subject ~ ' %' in row %}
+                                                <span class="small text-secondary" style="font-size: 11px;">({{ row[subject ~ ' %'] }}%)</span>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                    <td class="fw-bold text-primary">
+                                        {{ row['Total'] }}
+                                        {% if row['Max Total'] %}
+                                            <div class="small text-secondary fw-normal" style="font-size: 11px;">
+                                                ({{ (row['Total'] / row['Max Total'] * 100) | round(1) }}%)
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="{{ 3 + subject_max_counts | length }}" class="text-center text-muted py-4">No summary statistics available.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Visual Analytics Chart -->
+    <div class="col-12 mb-4">
+        <div class="card-custom">
+            <div class="card-header-custom d-flex align-items-center gap-2">
+                <span class="material-icons text-success">bar_chart</span>
+                <h4 class="mb-0">Attendance Chart Representation</h4>
+            </div>
+            
+            <div style="position: relative; height: 350px;">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 4: All Raw Records -->
+    <div class="col-12 mb-4">
+        <div class="card-custom">
+            <div class="card-header-custom d-flex align-items-center gap-2">
+                <span class="material-icons text-secondary">view_list</span>
+                <h4 class="mb-0">All Logged Attendance Records</h4>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Roll Number</th>
+                            <th>Subject</th>
+                            <th>Time</th>
+                            <th>Date</th>
+                            <th>Teacher Assigned</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if records %}
+                            {% for record in records %}
+                            <tr>
+                                <td class="fw-semibold">{{ record[0] }}</td>
+                                <td>{{ record[1] }}</td>
+                                <td><span class="badge-custom">{{ record[4] }}</span></td>
+                                <td>{{ record[2] }}</td>
+                                <td>{{ record[3] }}</td>
+                                <td>{{ record[5] }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">No raw logs available.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Library and Execution -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+    // Theme palettes (Google Brand colors)
+    const googleColors = [
+        'rgba(26, 115, 232, 0.85)',   // Blue
+        'rgba(52, 168, 83, 0.85)',    // Green
+        'rgba(251, 188, 5, 0.85)',    // Yellow
+        'rgba(234, 67, 53, 0.85)'     // Red
+    ];
+    const googleBorders = [
+        '#1a73e8',
+        '#34a853',
+        '#fbbc05',
+        '#ea4335'
+    ];
+
+    const chartData = {
+        labels: [{% for row in summary %}"{{ row['Name'] }}",{% endfor %}],
+        datasets: [
+            {% for subject in subject_max_counts %}
+            {
+                label: '{{ subject }}',
+                data: [{% for row in summary %}{{ row.get(subject, 0) }},{% endfor %}],
+                backgroundColor: googleColors[{{ loop.index0 % 4 }}],
+                borderColor: googleBorders[{{ loop.index0 % 4 }}],
+                borderWidth: 1.5,
+                borderRadius: 4
+            },
+            {% endfor %}
+        ]
+    };
+
+    const chartOptions = {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                beginAtZero: true,
+                grid: {
+                    color: '#dadce0'
+                },
+                title: {
+                    display: true,
+                    text: 'Classes Attended',
+                    font: {
+                        family: 'Roboto',
+                        weight: 'bold'
+                    }
+                }
+            },
+            y: {
+                grid: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Students',
+                    font: {
+                        family: 'Roboto',
+                        weight: 'bold'
+                    }
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    font: {
+                        family: 'Outfit'
+                    }
+                }
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+                padding: 12,
+                titleFont: {
+                    family: 'Outfit',
+                    size: 14
+                },
+                bodyFont: {
+                    family: 'Roboto'
+                }
+            }
+        }
+    };
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: chartData,
+        options: chartOptions
+    });
+});
+</script>
+{% endblock %}

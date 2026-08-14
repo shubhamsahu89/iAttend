@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card-custom text-center py-4">
+            <span class="material-icons text-success" style="font-size: 48px; margin-bottom: 12px;">camera_alt</span>
+            <h3 class="mb-3">Start Attendance Session</h3>
+            <p class="text-secondary small mb-4">Choose the course/subject to initiate the face recognition scanner.</p>
+            
+            <form action="/select_subject" method="POST" class="text-start">
+                <div class="form-group-custom">
+                    <label for="subject" class="form-label small text-secondary fw-bold">Select Course / Subject</label>
+                    <select class="form-control form-control-custom" id="subject" name="subject" required>
+                        <option value="">-- Choose Subject --</option>
+                        <option value="BIG DATA">BIG DATA</option>
+                        <option value="CYBER SECURITY">CYBER SECURITY</option>
+                        <option value="HADOOP LAB">HADOOP LAB</option>
+                        <option value="DMW">DMW</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-google w-100 py-3 mt-3 d-flex align-items-center justify-content-center gap-2">
+                    <span class="material-icons">play_circle</span> Launch Face Recognition
+                </button>
+            </form>
+            
+            <div class="mt-4 text-center">
+                <a href="{{ url_for('index') }}" class="text-primary text-decoration-none small">Go to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
